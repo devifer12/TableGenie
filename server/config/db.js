@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ silent: true });
 
 const uri = process.env.MONGODB_URI;
 const dbName = process.env.DB_NAME || 'tablegenie';
@@ -17,8 +17,9 @@ export const connectDB = async () => {
     }
 
     client = new MongoClient(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      ssl: true,
+      tls: true,
+      tlsInsecure: process.env.NODE_ENV !== 'production',
     });
 
     await client.connect();
