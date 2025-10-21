@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { useNavigate } from "react-router-dom";
 
 const TableGenieLanding = () => {
   const [activeFeature, setActiveFeature] = useState(0);
-  const navigate = useNavigate();
 
   const features = [
     {
@@ -69,10 +67,8 @@ const TableGenieLanding = () => {
                 className="text-slate-600 hover:text-slate-900 transition-colors">
                 Contact
               </a>
-              <button
-                onClick={() => navigate('/signup')}
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300">
-                List Your Restaurant
+              <button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300">
+                Get Started
               </button>
             </div>
           </div>
@@ -110,10 +106,8 @@ const TableGenieLanding = () => {
             <button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-8 py-4 rounded-full text-lg font-medium hover:shadow-xl hover:scale-105 transition-all duration-300">
               Try Demo
             </button>
-            <button
-              onClick={() => navigate('/signup')}
-              className="border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-full text-lg font-medium hover:border-indigo-400 hover:text-indigo-600 transition-all duration-300">
-              List Your Restaurant
+            <button className="border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-full text-lg font-medium hover:border-indigo-400 hover:text-indigo-600 transition-all duration-300">
+              For Restaurants
             </button>
           </motion.div>
 
@@ -280,10 +274,8 @@ const TableGenieLanding = () => {
             zero fraud.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => navigate('/signup')}
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-8 py-4 rounded-full text-lg font-medium hover:shadow-xl hover:scale-105 transition-all duration-300">
-              List Your Restaurant
+            <button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-8 py-4 rounded-full text-lg font-medium hover:shadow-xl hover:scale-105 transition-all duration-300">
+              Get Started Today
             </button>
             <button className="border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-full text-lg font-medium hover:border-indigo-400 hover:text-indigo-600 transition-all duration-300">
               Schedule Demo
