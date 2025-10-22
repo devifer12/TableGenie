@@ -1,5 +1,6 @@
 import express from 'express';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 import { Restaurant, User, TempRegistration } from '../models/schema.js';
 
 const router = express.Router();
@@ -7,12 +8,18 @@ const router = express.Router();
 // Step 1: Register Restaurant
 router.post('/register/restaurant', async (req, res) => {
   try {
-    const { name, email, phone } = req.body;
+    const { name, email, phone, password } = req.body;
 
     // Validation
-    if (!name || !email || !phone) {
+    if (!name || !email || !phone || !password) {
       return res.status(400).json({ 
         message: 'All fields are required' 
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ 
+        message: 'Password must be at least 6 characters' 
       });
     }
 
@@ -24,8 +31,16 @@ router.post('/register/restaurant', async (req, res) => {
       });
     }
 
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // Create restaurant
-    const restaurant = await Restaurant.create({ name, email, phone });
+    const restaurant = await Restaurant.create({ 
+      name, 
+      email, 
+      phone, 
+      password: hashedPassword 
+    });
 
     // Generate temporary token for multi-step registration
     const tempToken = crypto.randomBytes(32).toString('hex');
@@ -37,7 +52,6 @@ router.post('/register/restaurant', async (req, res) => {
     });
 
     // TODO: Send OTP to email
-    // await sendOTPEmail(email, otp);
     console.log('📧 OTP Email would be sent to:', email);
     console.log('⚠️  Demo Mode: OTP verification is currently bypassed');
 
@@ -185,6 +199,77 @@ router.post('/register/user', async (req, res) => {
     console.error('User registration error:', error);
     res.status(500).json({ 
       message: 'Failed to complete registration',
+      error: error.message 
+    });
+  }
+});
+
+// Login Route
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ 
+        message: 'Email and password are required' 
+      });
+    }
+
+    // Find restaurant
+    const restaurant = await Restaurant.findByEmail(email);
+    if (!restaurant) {
+      return res.status(401).json({ 
+        message: 'Invalid email or password' 
+      });
+    }
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, restaurant.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ 
+        message: 'Invalid email or password' 
+      });
+    }
+
+    // Find user associated with restaurant
+    const user = await User.findByRestaurantId(restaurant._id.toString());
+    if (!user) {
+      return res.status(404).json({ 
+        message: 'User profile not found. Please complete registration.' 
+      });
+    }
+
+    // Generate auth token
+    const authToken = crypto.randomBytes(32).toString('hex');
+    
+    // TODO: Implement proper JWT token generation
+    // const authToken = jwt.sign(
+    //   { userId: user._id, restaurantId: restaurant._id },
+    //   process.env.JWT_SECRET,
+    //   { expiresIn: '7d' }
+    // );
+
+    res.json({
+      message: 'Login successful',
+      token: authToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        designation: user.designation,
+        email: user.email
+      },
+      restaurant: {
+        id: restaurant._id,
+        name: restaurant.name,
+        email: restaurant.email,
+        phone: restaurant.phone
+      }
+    });
+
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ 
+      message: 'Failed to login',
       error: error.message 
     });
   }

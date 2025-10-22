@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 
 const Register = () => {
@@ -13,7 +13,9 @@ const Register = () => {
   const [restaurantData, setRestaurantData] = useState({
     name: '',
     email: '',
-    phone: ''
+    phone: '',
+    password: '',
+    confirmPassword: ''
   });
   
   const [otp, setOtp] = useState('');
@@ -28,10 +30,27 @@ const Register = () => {
   const handleRestaurantSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Validate passwords match
+    if (restaurantData.password !== restaurantData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (restaurantData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await api.post('/api/auth/register/restaurant', restaurantData);
+      const response = await api.post('/api/auth/register/restaurant', {
+        name: restaurantData.name,
+        email: restaurantData.email,
+        phone: restaurantData.phone,
+        password: restaurantData.password
+      });
       setTempToken(response.data.tempToken);
       setStep(2);
     } catch (err) {
@@ -88,8 +107,10 @@ const Register = () => {
         tempToken
       });
       
-      // Store auth token
+      // Store auth token and user data
       localStorage.setItem('authToken', response.data.token);
+      localStorage.setItem('userData', JSON.stringify(response.data.user));
+      localStorage.setItem('restaurantData', JSON.stringify(response.data.restaurant));
       setStep(4);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to complete registration');
@@ -190,6 +211,36 @@ const Register = () => {
                       onChange={(e) => setRestaurantData({...restaurantData, phone: e.target.value})}
                       className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
                       placeholder="+1 (555) 123-4567"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Password *
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={restaurantData.password}
+                      onChange={(e) => setRestaurantData({...restaurantData, password: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                      placeholder="••••••••"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Confirm Password *
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={restaurantData.confirmPassword}
+                      onChange={(e) => setRestaurantData({...restaurantData, confirmPassword: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                      placeholder="••••••••"
                     />
                   </div>
 
@@ -353,6 +404,18 @@ const Register = () => {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Login Link */}
+          {step < 4 && (
+            <div className="mt-6 text-center">
+              <p className="text-slate-600">
+                Already have an account?{' '}
+                <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-medium">
+                  Login here
+                </Link>
+              </p>
+            </div>
+          )}
         </motion.div>
 
         {/* Back to Home */}

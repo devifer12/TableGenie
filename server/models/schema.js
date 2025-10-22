@@ -12,8 +12,8 @@ export class Restaurant {
       name: data.name,
       email: data.email,
       phone: data.phone,
+      password: data.password, // Add password field
       status: 'pending', // pending, active, inactive
-      beaconId: null,
       beaconConfig: null,
       settings: {
         currency: 'USD',

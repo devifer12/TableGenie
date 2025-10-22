@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
+import { initializeDatabase } from './config/initDb.js';
 import authRoutes from './routes/auth.js';
 
 // Load environment variables
@@ -18,8 +19,10 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB and initialize
+connectDB().then(() => {
+  initializeDatabase();
+});
 
 // Routes
 app.get('/', (req, res) => {
