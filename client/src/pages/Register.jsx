@@ -372,7 +372,7 @@ const Register = () => {
                     disabled={loading}
                     className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Setting up...' : 'Setup Your Online Restaurant'}
+                    {loading ? 'Setting up...' : 'Complete Registration'}
                   </button>
                 </form>
               </motion.div>
